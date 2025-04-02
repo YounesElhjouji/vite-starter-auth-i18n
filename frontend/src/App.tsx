@@ -1,24 +1,33 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
+import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
 
 function App() {
-  const [message, setMessage] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    async function fetchMessage() {
-      const response = await fetch("http://localhost:1111");
-      console.log("response", response);
-      const text = await response.text();
-      setMessage(text);
-    }
-    fetchMessage();
-  });
-
   return (
-    <div className="w-screen flex flex-col items-center justify-center">
-      <p className="text-3xl">Message from the backend</p>
-      <p>{message}</p>
-    </div>
+    <BrowserRouter>
+      <div className="w-screen h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <nav className="mb-4">
+          <ul className="flex space-x-4">
+            <li>
+              <Link to="/" className="hover:text-blue-500">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" className="hover:text-blue-500">
+                About
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

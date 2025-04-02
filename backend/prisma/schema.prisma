@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Specify PostgreSQL
+  url      = env("DATABASE_URL") // Get URL from environment variable
+}
+
+// --- Models Will Go Here ---
+model User {
+  id           String   @id @default(cuid()) // Use cuid for unique IDs
+  username     String   @unique // Usernames must be unique
+  passwordHash String   // Store the hashed password here
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

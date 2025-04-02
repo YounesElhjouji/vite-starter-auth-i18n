@@ -1,0 +1,12 @@
+{
+  "home": "Accueil",
+  "about": "À Propos",
+  "login": "Connexion",
+  "toggleTheme": "Changer de thème",
+  "backendMessageTitle": "Message du backend",
+  "loadingMessage": "Chargement du message...",
+  "fetchError": "Échec de la récupération du message du backend.",
+  "aboutTitle": "À Propos de Nous",
+  "aboutContent": "Ceci est le contenu de la page à propos.",
+  "aboutExtra": "Il se trouve dans le conteneur principal défini dans App.tsx."
+}

@@ -1,0 +1,12 @@
+{
+  "home": "Home",
+  "about": "About",
+  "login": "Login",
+  "toggleTheme": "Toggle theme",
+  "backendMessageTitle": "Message from the backend",
+  "loadingMessage": "Loading message...",
+  "fetchError": "Failed to fetch message from backend.",
+  "aboutTitle": "About Us",
+  "aboutContent": "This is the about page content.",
+  "aboutExtra": "It lives inside the main container defined in App.tsx."
+}

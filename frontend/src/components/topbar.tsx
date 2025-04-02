@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Moon, Sun } from "lucide-react"; // Import icons
+import { Link, useLocation } from "react-router-dom";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 export default function Topbar() {
-  // State to track the current theme
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
+
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage first, then system preference, default to light
+    // ... (theme state logic remains the same)
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      return savedTheme === "dark";
-    }
+    if (savedTheme) return savedTheme === "dark";
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
-  // Effect to apply the theme class to <html> and save preference
   useEffect(() => {
+    // ... (theme effect logic remains the same)
     const root = window.document.documentElement;
     if (isDarkMode) {
       root.classList.add("dark");
@@ -24,51 +26,81 @@ export default function Topbar() {
       root.classList.remove("dark");
       localStorage.setItem("theme", "light");
     }
-  }, [isDarkMode]); // Re-run effect when isDarkMode changes
+  }, [isDarkMode]);
 
-  // Function to toggle the theme
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  const topbarHeightClass = "h-12"; // Adjust as needed
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const changeLanguage = (lng: string) => i18n.changeLanguage(lng);
+  const topbarHeightClass = "h-12";
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-10 bg-white dark:bg-gray-800 shadow-md px-4 flex justify-between items-center ${topbarHeightClass}`}
+      className={cn(
+        "fixed top-0 left-0 right-0 z-10 bg-white dark:bg-gray-800 shadow-md px-4 flex justify-between items-center",
+        topbarHeightClass,
+      )}
     >
-      {/* Left side links */}
-      <ul className="flex space-x-4 items-center">
-        <li>
-          <Link to="/" className="hover:text-blue-500 dark:hover:text-blue-400">
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/about"
-            className="hover:text-blue-500 dark:hover:text-blue-400"
-          >
-            About
-          </Link>
-        </li>
-      </ul>
+      {/* Left side navigation links */}
+      <div className="flex space-x-1 items-center">
+        <Button
+          variant={isActive("/") ? "secondary" : "ghost"}
+          size="sm"
+          asChild
+        >
+          <Link to="/">{t("home")}</Link>
+        </Button>
+        <Button
+          variant={isActive("/about") ? "secondary" : "ghost"}
+          size="sm"
+          asChild
+        >
+          <Link to="/about">{t("about")}</Link>
+        </Button>
+      </div>
 
-      {/* Right side controls */}
-      <div className="flex items-center space-x-2">
+      {/* Right side controls - REORDERED */}
+      <div className="flex items-center space-x-1">
+        {/* Login Button - Moved earlier */}
+        <Button variant="outline" size="sm">
+          {t("login")}
+        </Button>
+
         {/* Dark Mode Toggle Button */}
         <Button variant="ghost" size="icon" onClick={toggleTheme}>
           {isDarkMode ? (
-            <Sun className="h-[1.2rem] w-[1.2rem]" /> // Sun icon for dark mode
+            <Sun className="h-[1.2rem] w-[1.2rem]" />
           ) : (
-            <Moon className="h-[1.2rem] w-[1.2rem]" /> // Moon icon for light mode
+            <Moon className="h-[1.2rem] w-[1.2rem]" />
           )}
-          <span className="sr-only">Toggle theme</span> {/* Accessibility */}
+          <span className="sr-only">{t("toggleTheme")}</span>
         </Button>
 
-        {/* Login Button */}
-        <Button variant="outline" size="sm">
-          Login
+        {/* Language Switcher Buttons - Moved to the end */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => changeLanguage("en")}
+          disabled={i18n.resolvedLanguage === "en"}
+          aria-label="Switch to English"
+          className={cn(
+            "text-xs", // Make text slightly smaller if needed
+            i18n.resolvedLanguage !== "en" && "opacity-70", // Dim inactive
+          )}
+        >
+          EN
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => changeLanguage("fr")}
+          disabled={i18n.resolvedLanguage === "fr"}
+          aria-label="Switch to French"
+          className={cn(
+            "text-xs", // Make text slightly smaller if needed
+            i18n.resolvedLanguage !== "fr" && "opacity-70", // Dim inactive
+          )}
+        >
+          FR
         </Button>
       </div>
     </nav>

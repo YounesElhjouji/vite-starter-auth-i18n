@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 function HomePage() {
+  const { t } = useTranslation(); // Use the hook
   const [message, setMessage] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     async function fetchMessage() {
+      setIsLoading(true); // Start loading
       try {
-        // Ensure your backend URL is correct
         const response = await fetch("http://localhost:1111");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -15,22 +18,26 @@ function HomePage() {
         setMessage(text);
       } catch (error) {
         console.error("Failed to fetch message:", error);
-        setMessage("Failed to fetch message from backend.");
+        setMessage(t("fetchError")); // Use translated error message
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     }
     fetchMessage();
-  }, []); // Empty dependency array ensures this runs only once on mount
+    // Add t to dependency array if fetchError relies on it,
+    // though usually error messages are stable per language load.
+  }, [t]); // Add t here
 
   return (
-    // Remove screen width/height/backgrounds - handled by App.tsx's main container
-    // Add styling for the *content* of the page as needed
     <div className="flex flex-col items-center justify-center text-center py-10">
-      <h1 className="text-3xl font-bold mb-4">Message from the backend</h1>
-      <p className="text-lg">{message}</p>
+      <h1 className="text-3xl font-bold mb-4">
+        {t("backendMessageTitle")} {/* Use t function */}
+      </h1>
+      <p className="text-lg">
+        {isLoading ? t("loadingMessage") : message}{" "}
+        {/* Show loading or message */}
+      </p>
       {/* Add more content here */}
-      <div className="mt-8">
-        This is the home page content area. It sits within the main container.
-      </div>
     </div>
   );
 }

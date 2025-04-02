@@ -1,24 +1,46 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../services/auth.service";
+import { PrismaClient } from "@prisma/client";
+import { JwtPayload } from "jsonwebtoken";
 
-export const authMiddleware = (
+const prisma = new PrismaClient();
+
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): void => {
+): Promise<void> => {
   const token = req.cookies.accessToken;
 
   if (!token) {
     res.status(401).json({ error: "Unauthorized" });
-    return; // Explicitly return void after sending a response
+    return;
   }
 
   try {
     const payload = verifyAccessToken(token);
-    (req as any).user = payload; // Attach user info to the request object
-    next(); // Pass control to the next middleware or route handler
+
+    // Type narrowing: Check if payload is a JwtPayload
+    if (typeof payload === "string" || !("userId" in payload)) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    // Fetch the user from the database using the userId from the payload
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+    });
+
+    if (!user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    // Attach user info to the request object
+    (req as any).user = { id: user.id, username: user.username };
+    next();
   } catch (error) {
     res.status(401).json({ error: "Invalid or expired token" });
-    return; // Explicitly return void after sending a response
+    return;
   }
 };

@@ -2,30 +2,26 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
+import Topbar from "./components/topbar";
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="w-screen h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-        <nav className="mb-4">
-          <ul className="flex space-x-4">
-            <li>
-              <Link to="/" className="hover:text-blue-500">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" className="hover:text-blue-500">
-                About
-              </Link>
-            </li>
-          </ul>
-        </nav>
+      {/* Main container with dark/light mode background */}
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        {/* Fixed Top Navigation Bar */}
 
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-        </Routes>
+        <Topbar />
+        {/* Content Area - Add padding-top to avoid overlap with fixed nav */}
+        <main className="pt-16 px-4">
+          {" "}
+          {/* Adjust pt-16 based on your nav height */}
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            {/* Add a route for login later */}
+          </Routes>
+        </main>
       </div>
     </BrowserRouter>
   );

@@ -19,6 +19,12 @@ router.post("/signup", signupController);
 // Login route
 router.post("/login", loginController);
 
+router.post("/logout", (req, res) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  res.status(200).json({ message: "Logged out successfully" });
+});
+
 // User info route (requires auth)
 router.get("/userInfo", authMiddleware, (req, res) => {
   const user = (req as any).user; // Extract user info from the request object

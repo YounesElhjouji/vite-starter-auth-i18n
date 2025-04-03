@@ -5,19 +5,22 @@ import { Button } from "./ui/button";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
-export default function Topbar() {
+interface TopbarProps {
+  username: string | null;
+  setUsername: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export default function Topbar({ username, setUsername }: TopbarProps) {
   const { t, i18n } = useTranslation();
   const location = useLocation();
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // ... (theme state logic remains the same)
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) return savedTheme === "dark";
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
   useEffect(() => {
-    // ... (theme effect logic remains the same)
     const root = window.document.documentElement;
     if (isDarkMode) {
       root.classList.add("dark");
@@ -32,6 +35,18 @@ export default function Topbar() {
   const changeLanguage = (lng: string) => i18n.changeLanguage(lng);
   const topbarHeightClass = "h-12";
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:1111/api/auth/logout", {
+        method: "POST",
+        credentials: "include", // Include cookies
+      });
+      setUsername(null); // Clear username on logout
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  };
 
   return (
     <nav
@@ -58,12 +73,31 @@ export default function Topbar() {
         </Button>
       </div>
 
-      {/* Right side controls - REORDERED */}
+      {/* Right side controls */}
       <div className="flex items-center space-x-1">
-        {/* Login Button - Moved earlier */}
-        <Button variant="outline" size="sm">
-          {t("login")}
-        </Button>
+        {username ? (
+          <>
+            {/* Show username */}
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              {t("loggedInAs", { username })}
+            </span>
+            {/* Log Out button */}
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              {t("logout")}
+            </Button>
+          </>
+        ) : (
+          <>
+            {/* Log In button */}
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/login">{t("login")}</Link>
+            </Button>
+            {/* Register button */}
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/register">{t("register")}</Link>
+            </Button>
+          </>
+        )}
 
         {/* Dark Mode Toggle Button */}
         <Button variant="ghost" size="icon" onClick={toggleTheme}>
@@ -75,7 +109,7 @@ export default function Topbar() {
           <span className="sr-only">{t("toggleTheme")}</span>
         </Button>
 
-        {/* Language Switcher Buttons - Moved to the end */}
+        {/* Language Switcher Buttons */}
         <Button
           variant="ghost"
           size="sm"
@@ -83,8 +117,8 @@ export default function Topbar() {
           disabled={i18n.resolvedLanguage === "en"}
           aria-label="Switch to English"
           className={cn(
-            "text-xs", // Make text slightly smaller if needed
-            i18n.resolvedLanguage !== "en" && "opacity-70", // Dim inactive
+            "text-xs",
+            i18n.resolvedLanguage !== "en" && "opacity-70",
           )}
         >
           EN
@@ -96,8 +130,8 @@ export default function Topbar() {
           disabled={i18n.resolvedLanguage === "fr"}
           aria-label="Switch to French"
           className={cn(
-            "text-xs", // Make text slightly smaller if needed
-            i18n.resolvedLanguage !== "fr" && "opacity-70", // Dim inactive
+            "text-xs",
+            i18n.resolvedLanguage !== "fr" && "opacity-70",
           )}
         >
           FR

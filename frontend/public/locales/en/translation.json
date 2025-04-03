@@ -28,5 +28,10 @@
   "usernameRequired": "Username is required.",
   "passwordRequired": "Password is required.",
   "welcomeMessage": "Welcome to our application!",
-  "errorOccurred": "An error occurred. Please try again later."
+  "errorOccurred": "An error occurred. Please try again later.",
+  "homePageTitle": "Welcome to the Home Page",
+  "welcomeBackMessage": "Welcome back, {{username}}!",
+  "loggedInHomeMessage": "Feel free to explore the app and enjoy your experience.",
+  "notLoggedInMessage": "You are not logged in. Please log in to access more features.",
+  "loginButton": "Log In"
 }

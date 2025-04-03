@@ -77,10 +77,6 @@ export default function Topbar({ username, setUsername }: TopbarProps) {
       <div className="flex items-center space-x-1">
         {username ? (
           <>
-            {/* Show username */}
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              {t("loggedInAs", { username })}
-            </span>
             {/* Log Out button */}
             <Button variant="outline" size="sm" onClick={handleLogout}>
               {t("logout")}

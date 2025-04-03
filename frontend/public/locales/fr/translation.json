@@ -28,5 +28,10 @@
   "usernameRequired": "Le nom d'utilisateur est requis.",
   "passwordRequired": "Le mot de passe est requis.",
   "welcomeMessage": "Bienvenue dans notre application !",
-  "errorOccurred": "Une erreur s'est produite. Veuillez réessayer plus tard."
+  "errorOccurred": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+  "homePageTitle": "Bienvenue sur la Page d'Accueil",
+  "welcomeBackMessage": "Bon retour, {{username}} !",
+  "loggedInHomeMessage": "Explorez l'application et profitez de votre expérience.",
+  "notLoggedInMessage": "Vous n'êtes pas connecté. Veuillez vous connecter pour accéder à plus de fonctionnalités.",
+  "loginButton": "Se Connecter"
 }

@@ -2,7 +2,7 @@ import RegisterForm from "../components/RegisterForm";
 import { useTranslation } from "react-i18next";
 
 interface RegisterPageProps {
-  setUsername: React.Dispatch<React.SetStateAction<string | null>>;
+  setUsername: React.Dispatch<React.SetStateAction<string | null>>; // Add prop type
 }
 
 export default function RegisterPage({ setUsername }: RegisterPageProps) {

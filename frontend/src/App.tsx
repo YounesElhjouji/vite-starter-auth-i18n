@@ -8,33 +8,38 @@ import Topbar from "./components/topbar";
 import RequireAuth from "./components/RequireAuth";
 import RedirectIfAuth from "./components/RedirectIfAuth";
 import { useState, useEffect } from "react";
+import { fetchUserInfo } from "./services/api"; // Import the API function
 
 function App() {
   const [username, setUsername] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const checkAuthStatus = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch(
-          "http://localhost:1111/api/auth/userInfo",
-          {
-            credentials: "include",
-          },
-        );
-        const data = await response.json();
-        if (data.username) {
+        const data = await fetchUserInfo(); // Use the API service function
+        if (data && data.username) {
           setUsername(data.username);
         } else {
           setUsername(null);
         }
       } catch (error) {
-        console.error("Failed to fetch user info:", error);
+        // Error likely means not authenticated or server issue
+        console.error("Failed to fetch user info on load:", error);
         setUsername(null);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     };
 
-    fetchUserInfo();
+    checkAuthStatus();
   }, []);
+
+  // Optional: Show a loading indicator while checking auth
+  if (isLoading) {
+    return <div>Loading application...</div>; // Or a spinner component
+  }
 
   return (
     <BrowserRouter>
@@ -46,7 +51,7 @@ function App() {
             <Route
               path="/"
               element={
-                <HomePage username={username} setUsername={setUsername} />
+                <HomePage username={username} /> // Removed setUsername prop
               }
             />
 
@@ -73,7 +78,8 @@ function App() {
               path="/register"
               element={
                 <RedirectIfAuth username={username}>
-                  <RegisterPage />
+                  {/* Pass setUsername to RegisterPage if needed */}
+                  <RegisterPage setUsername={setUsername} />
                 </RedirectIfAuth>
               }
             />

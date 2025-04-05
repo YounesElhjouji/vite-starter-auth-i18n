@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { logoutUser } from "../services/api"; // Import the API function
 
 interface TopbarProps {
   username: string | null;
@@ -13,7 +14,9 @@ interface TopbarProps {
 export default function Topbar({ username, setUsername }: TopbarProps) {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate(); // Hook for navigation
 
+  // ... (useState and useEffect for theme remain the same)
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) return savedTheme === "dark";
@@ -38,13 +41,12 @@ export default function Topbar({ username, setUsername }: TopbarProps) {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:1111/api/auth/logout", {
-        method: "POST",
-        credentials: "include", // Include cookies
-      });
-      setUsername(null); // Clear username on logout
+      await logoutUser(); // Use the API service function
+      setUsername(null); // Clear username state
+      navigate("/"); // Redirect to home page after logout
     } catch (error) {
       console.error("Failed to logout:", error);
+      // Optionally show an error message to the user
     }
   };
 
@@ -77,18 +79,15 @@ export default function Topbar({ username, setUsername }: TopbarProps) {
       <div className="flex items-center space-x-1">
         {username ? (
           <>
-            {/* Log Out button */}
             <Button variant="outline" size="sm" onClick={handleLogout}>
               {t("logout")}
             </Button>
           </>
         ) : (
           <>
-            {/* Log In button */}
             <Button variant="outline" size="sm" asChild>
               <Link to="/login">{t("login")}</Link>
             </Button>
-            {/* Register button */}
             <Button variant="outline" size="sm" asChild>
               <Link to="/register">{t("register")}</Link>
             </Button>
@@ -106,6 +105,7 @@ export default function Topbar({ username, setUsername }: TopbarProps) {
         </Button>
 
         {/* Language Switcher Buttons */}
+        {/* ... (language buttons remain the same) ... */}
         <Button
           variant="ghost"
           size="sm"

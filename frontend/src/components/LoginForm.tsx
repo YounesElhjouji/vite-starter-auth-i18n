@@ -2,42 +2,34 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useTranslation } from "react-i18next";
+import { loginUser } from "../services/api"; // Import the API function
+import { useNavigate } from "react-router-dom"; // Import for redirect
 
 interface LoginFormProps {
-  onLoginSuccess?: (username: string) => void; // Callback to update username state
+  onLoginSuccess: (username: string) => void; // Callback to update username state
 }
 
 export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const { t } = useTranslation();
-  const [username, setUsername] = useState("");
+  const navigate = useNavigate(); // Hook for navigation
+  const [username, setUsernameState] = useState(""); // Renamed state setter
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
+    setError(null);
+    setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:1111/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Include cookies
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        if (onLoginSuccess) {
-          onLoginSuccess(username); // Update username state in parent
-        }
-      } else {
-        setError(data.error || t("loginFailed"));
-      }
-    } catch (err) {
-      setError(t("loginFailed"));
+      await loginUser(username, password); // Use the API service function
+      onLoginSuccess(username); // Update username state in parent
+      navigate("/"); // Redirect to home page on successful login
+    } catch (err: any) {
+      setError(err.message || t("loginFailed"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,8 +42,9 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         type="text"
         placeholder={t("usernamePlaceholder")}
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => setUsernameState(e.target.value)} // Use renamed setter
         className="w-full"
+        disabled={isLoading}
       />
       <Input
         type="password"
@@ -59,10 +52,11 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="w-full"
+        disabled={isLoading}
       />
       {error && <p className="text-red-500 text-sm">{error}</p>}
-      <Button type="submit" className="w-full">
-        {t("loginButton")}
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? t("loadingMessage") : t("loginButton")}
       </Button>
     </form>
   );

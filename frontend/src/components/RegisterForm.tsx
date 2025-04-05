@@ -2,74 +2,49 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useTranslation } from "react-i18next";
+import { registerUser, loginUser } from "../services/api"; // Import API functions
+import { useNavigate } from "react-router-dom"; // Import for redirect
 
 interface RegisterFormProps {
-  onLoginSuccess?: (username: string) => void; // Callback to update username state
+  onLoginSuccess: (username: string) => void; // Callback to update username state
 }
 
 export default function RegisterForm({ onLoginSuccess }: RegisterFormProps) {
   const { t } = useTranslation();
-  const [username, setUsername] = useState("");
+  const navigate = useNavigate(); // Hook for navigation
+  const [username, setUsernameState] = useState(""); // Renamed state setter
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null); // Keep success for feedback
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
-    setSuccess(null); // Clear previous success messages
+    setError(null);
+    setSuccess(null);
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError(t("passwordsDoNotMatch"));
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      // Register the user
-      const registerResponse = await fetch(
-        "http://localhost:1111/api/auth/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        },
-      );
+      // 1. Register the user
+      await registerUser(username, password); // Use API service
 
-      const registerData = await registerResponse.json();
+      // 2. Log the user in automatically
+      await loginUser(username, password); // Use API service
 
-      if (registerResponse.ok) {
-        // Log the user in automatically after successful registration
-        const loginResponse = await fetch(
-          "http://localhost:1111/api/auth/login",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include", // Include cookies
-            body: JSON.stringify({ username, password }),
-          },
-        );
-
-        const loginData = await loginResponse.json();
-
-        if (loginResponse.ok) {
-          setSuccess(t("registerSuccess"));
-          if (onLoginSuccess) {
-            onLoginSuccess(username); // Update username state in parent
-          }
-        } else {
-          setError(loginData.error || t("loginFailed"));
-        }
-      } else {
-        setError(registerData.error || t("registerFailed"));
-      }
-    } catch (err) {
-      setError(t("registerFailed"));
+      setSuccess(t("registerSuccess")); // Show success message briefly
+      onLoginSuccess(username); // Update global state
+      navigate("/"); // Redirect to home page
+    } catch (err: any) {
+      setError(err.message || t("registerFailed"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -82,8 +57,9 @@ export default function RegisterForm({ onLoginSuccess }: RegisterFormProps) {
         type="text"
         placeholder={t("usernamePlaceholder")}
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => setUsernameState(e.target.value)} // Use renamed setter
         className="w-full"
+        disabled={isLoading}
       />
       <Input
         type="password"
@@ -91,6 +67,7 @@ export default function RegisterForm({ onLoginSuccess }: RegisterFormProps) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="w-full"
+        disabled={isLoading}
       />
       <Input
         type="password"
@@ -98,11 +75,12 @@ export default function RegisterForm({ onLoginSuccess }: RegisterFormProps) {
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
         className="w-full"
+        disabled={isLoading}
       />
       {error && <p className="text-red-500 text-sm">{error}</p>}
       {success && <p className="text-green-500 text-sm">{success}</p>}
-      <Button type="submit" className="w-full">
-        {t("registerButton")}
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? t("loadingMessage") : t("registerButton")}
       </Button>
     </form>
   );

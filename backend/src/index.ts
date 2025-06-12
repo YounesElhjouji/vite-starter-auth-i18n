@@ -15,7 +15,12 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 
-// Start the server
-app.listen(config.port, () => {
-  console.log(`Server running on http://localhost:${config.port}`);
-});
+// Only start the server if this file is run directly (not imported by Vercel)
+if (require.main === module) {
+  const PORT = process.env.PORT || 1111;
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app; // Start the server

@@ -8,6 +8,8 @@ This project is a **full-stack TypeScript starter template** designed to acceler
 
 **The goal is simple:** Skip the repetitive setup and boilerplate for common features like authentication and i18n, and jump straight into building your application's core logic and unique features.
 
+[Deployed Website](https://vite-starter-auth-i18n.vercel.app/)
+
 ## Key Features
 
 - **Frontend (Vite + React + TypeScript):**
